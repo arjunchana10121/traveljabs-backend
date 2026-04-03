@@ -8,22 +8,25 @@ app.use(cors());
 app.use(express.json());
 
 const clinicsController = async (req, res) => {
-  const table = "Clinics";
+  try {
+    const table = "Clinics";
+    const fields = [
+      "ClinicID",
+      "ClinicName",
+      "ClinicAddress",
+      "ClinicPostcode",
+      "ClinicContact",
+      "ClinicManagerID",
+    ];
 
-  const fields = [
-    "ClinicID",
-    "ClinicName",
-    "ClinicAddress",
-    "ClinicPostcode",
-    "ClinicContact",
-    "ClinicManagerID",
-  ];
+    const sql = `SELECT ${fields.join(", ")} FROM ${table}`;
+    const [result] = await database.query(sql);
 
-  const sql = `SELECT ${fields.join(", ")} FROM ${table}`;
-
-  const [result] = await database.query(sql);
-
-  res.json(result);
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch clinics" });
+  }
 };
 
 app.get("/api/clinics", clinicsController);
