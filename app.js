@@ -99,7 +99,33 @@ const deleteStaffController = async (req, res) => {
   }
 };
 
+const updateStaffController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firstname, lastname, clinicId } = req.body;
 
+    const sql = `
+      UPDATE Staff
+      SET StaffFirstname = ?, StaffLastname = ?, StaffClinicID = ?
+      WHERE StaffID = ?
+    `;
+
+    const values = [firstname, lastname, clinicId, id];
+    const [result] = await database.query(sql, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Clinician not found" });
+    }
+
+    res.json({ message: "Clinician updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update clinician" });
+  }
+};
+
+
+app.put("/api/staff/:id", updateStaffController);
 app.delete("/api/staff/:id", deleteStaffController);
 app.get("/api/staff", staffController);
 app.post("/api/staff", createStaffController);
